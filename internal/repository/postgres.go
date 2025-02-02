@@ -19,7 +19,7 @@ type Config struct {
 
 func NewPostgresDB(cfg Config) (*pgxpool.Pool, error) {
 	dbPool, err := pgxpool.New(context.Background(), fmt.Sprintf("postgresql://%s:%s@%s:%s/%s",
-		os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME")))
+		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
 	if err != nil {
 		logrus.Fatalf("Unable to create connection pool: %s\n", err.Error())
 		os.Exit(1)
