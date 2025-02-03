@@ -12,19 +12,21 @@ import (
 type Config struct {
 	Host     string
 	Port     string
-	Username string
+	DBUser   string
 	Password string
 	DBName   string
+	SSLMode  string
 }
 
 func NewPostgresDB(cfg Config) (*pgxpool.Pool, error) {
-	dbPool, err := pgxpool.New(context.Background(), fmt.Sprintf("postgresql://%s:%s@%s:%s/%s",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName))
+	dbURL := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s",
+		cfg.DBUser, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
+
+	dbPool, err := pgxpool.New(context.Background(), dbURL)
 	if err != nil {
 		logrus.Fatalf("Unable to create connection pool: %s\n", err.Error())
 		os.Exit(1)
 	}
-	defer dbPool.Close()
 
 	err = dbPool.Ping(context.Background())
 	if err != nil {

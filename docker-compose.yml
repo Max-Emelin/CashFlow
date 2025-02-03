@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  goose:
+    image: golang:1.21
+    container_name: goose_migrations
+    depends_on:
+      - db
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    entrypoint: ["sh", "-c", "sleep 5 && go install github.com/pressly/goose/v3/cmd/goose@latest && goose -dir ./migrations postgres 'postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable' up"]
+
+  app:
+    build: .
+    container_name: go_app
+    restart: always
+    depends_on:
+      - db
+      - goose
+    env_file:
+      - .env
+    ports:
+      - "${SERVER_PORT}:8080"
+
+volumes:
+  pgdata:

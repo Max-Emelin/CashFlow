@@ -31,7 +31,7 @@ func (h *Handler) transfer(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Balance.Deposit(input); err != nil {
+	if err := h.services.Balance.Transfer(input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

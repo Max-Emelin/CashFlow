@@ -5,7 +5,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"
 )
@@ -21,16 +20,13 @@ func (r *TransactionPostgres) GetLastTransactions(userId uuid.UUID) ([]model.Tra
 	var transactions []model.Transaction
 
 	getTransactionsQuery := `
-		SELECT id, from_user_id, to_user_id, amount, created_at, type 
-		FROM transactions 
-		WHERE from_user_id = :userId 
-			OR to_user_id = :userId 
-		ORDER BY created_at DESC 
-		LIMIT 10`
-	args := pgx.NamedArgs{
-		"userId": userId,
-	}
-	rows, err := r.dbPool.Query(context.Background(), getTransactionsQuery, args)
+    	SELECT id, from_user_id, to_user_id, amount, created_at, type 
+    	FROM transactions 
+    	WHERE from_user_id = $1 
+        	OR to_user_id = $1 
+    	ORDER BY created_at DESC 
+    	LIMIT 10`
+	rows, err := r.dbPool.Query(context.Background(), getTransactionsQuery, userId)
 	if err != nil {
 		logrus.Errorf("Error fetching transactions for user %s: %s", userId, err.Error())
 		return nil, err

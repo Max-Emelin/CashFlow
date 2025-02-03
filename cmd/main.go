@@ -24,9 +24,10 @@ func main() {
 	dbPool, err := repository.NewPostgresDB(repository.Config{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
-		Username: os.Getenv("DB_USERNAME"),
+		DBUser:   os.Getenv("DB_USER"),
 		DBName:   os.Getenv("DB_NAME"),
 		Password: os.Getenv("DB_PASSWORD"),
+		SSLMode:  os.Getenv("DB_SSLMode"),
 	})
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())

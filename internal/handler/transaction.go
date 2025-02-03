@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) getLastTransactions(c *gin.Context) {
-	userId, err := uuid.Parse(c.Param("id"))
+	userId, err := uuid.Parse(c.DefaultQuery("id", ""))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
 		return
